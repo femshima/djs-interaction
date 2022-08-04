@@ -1,8 +1,8 @@
 import { Interaction } from 'discord.js';
 import AbortError from '../error/AbortError';
-import ChatInputApplicationCommandBase from './Comamnds/ChatInput';
-import MessageApplicationCommandBase from './Comamnds/MessageContextMenu';
-import UserApplicationCommandBase from './Comamnds/UserContextMenu';
+import ChatInputApplicationCommandBase from './Commands/ChatInput';
+import MessageApplicationCommandBase from './Commands/MessageContextMenu';
+import UserApplicationCommandBase from './Commands/UserContextMenu';
 import Button from './Components/Button';
 import SelectMenu from './Components/SelectMenu';
 import Modal from './Components/Modal';
