@@ -15,7 +15,7 @@ export default abstract class SelectMenu {
   data: APISelectMenuComponent;
   constructor(data: Omit<APISelectMenuComponent, 'type' | 'custom_id'>) {
     if (!this.store)
-      throw new InitializationError('Do not extend Button directly!');
+      throw new InitializationError('Do not extend SelectMenu directly!');
     const custom_id = this.store.getUniqueKey();
     this.data = new SelectMenuBuilder({ ...data, custom_id }).toJSON();
     this.store.set(this.data.custom_id, this);
