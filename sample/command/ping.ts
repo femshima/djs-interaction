@@ -4,10 +4,12 @@ import { More } from '../component';
 import Link from '../component/link';
 
 export default class Ping extends Command {
-  definition = {
-    name: 'ping',
-    description: 'Ping!',
-  };
+  constructor() {
+    super({
+      name: 'ping',
+      description: 'Ping!',
+    });
+  }
 
   async handle(interaction: CommandInteraction<'cached'>) {
     await interaction.reply({

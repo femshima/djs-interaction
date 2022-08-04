@@ -10,13 +10,13 @@ import {
 
 export default abstract class ChatInputApplicationCommandBase {
   readonly type = 'CHAT_INPUT';
-  abstract definition: ChatInputApplicationCommandDataWithSubCommand;
+  constructor(private data: ChatInputApplicationCommandDataWithSubCommand) {}
   handle?(interaction: ChatInputCommandInteraction<'cached'>): Promise<void>;
 
-  get pureDefinition(): ChatInputApplicationCommandData {
+  get definition(): ChatInputApplicationCommandData {
     return {
-      ...this.definition,
-      options: this.definition.options?.map((d2) => {
+      ...this.data,
+      options: this.data.options?.map((d2) => {
         if (d2 instanceof SubCommand) {
           return d2.definition;
         } else if (d2 instanceof SubCommandGroup) {
@@ -37,7 +37,7 @@ export default abstract class ChatInputApplicationCommandBase {
     };
   }
   get subCommands(): (SubCommand | SubCommandGroup)[] {
-    return (this.definition.options ?? [])
+    return (this.data.options ?? [])
       .map((o) => {
         if (o instanceof SubCommand) {
           return o;

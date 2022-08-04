@@ -60,9 +60,7 @@ export default class InteractionFrame<
 
     const defs: ApplicationCommandData[] = (await this.store.values())
       .map((v) => {
-        if (isT('CHAT_INPUT', v)) {
-          return v.pureDefinition;
-        } else if (isT('MESSAGE', v) || isT('USER', v)) {
+        if (isT('CHAT_INPUT', v) || isT('MESSAGE', v) || isT('USER', v)) {
           return v.definition;
         }
       })
