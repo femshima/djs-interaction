@@ -79,7 +79,6 @@ export default class InteractionFrame<
   }
 
   ComponentBase<T extends 'BUTTON' | 'SELECT_MENU' | 'MODAL'>(base: T) {
-    const store = this.store;
     const Bases = {
       BUTTON: Button,
       SELECT_MENU: SelectMenu,
@@ -87,7 +86,7 @@ export default class InteractionFrame<
     };
     const Base = Bases[base];
     Object.defineProperty(Base.prototype, 'store', {
-      get: () => store,
+      get: () => this.store,
     });
     // this is necessary for discord.js to treat WithHandler as ComponentBuilder,
     // urging it to call toJSON().
