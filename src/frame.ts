@@ -84,13 +84,20 @@ export default class InteractionFrame<
       SELECT_MENU: SelectMenu,
       MODAL: Modal,
     };
-    const Base = Bases[base];
-    Object.defineProperty(Base.prototype, 'store', {
-      get: () => this.store,
-    });
+    const BaseClass = Bases[base];
+    const Base = BaseClass.bind(null) as typeof BaseClass;
+
     // this is necessary for discord.js to treat WithHandler as ComponentBuilder,
     // urging it to call toJSON().
-    Object.setPrototypeOf(Base.prototype, ComponentBuilder.prototype);
+    Base.prototype = Object.create(ComponentBuilder.prototype);
+
+    Object.defineProperties(Base.prototype, {
+      ...Object.getOwnPropertyDescriptors(BaseClass.prototype),
+      store: {
+        get: () => this.store,
+      },
+    });
+
     return Base;
   }
 }
