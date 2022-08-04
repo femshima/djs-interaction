@@ -17,7 +17,7 @@ export interface SubCommandGroupDefinition
 }
 
 export abstract class SubCommand {
-  public definition: ApplicationCommandSubCommandData;
+  readonly definition: ApplicationCommandSubCommandData;
   constructor(definition: Omit<ApplicationCommandSubCommandData, 'type'>) {
     this.definition = {
       type: ApplicationCommandOptionType.Subcommand,
@@ -29,7 +29,7 @@ export abstract class SubCommand {
   ): Promise<void>;
 }
 export abstract class SubCommandGroup {
-  public definition: SubCommandGroupDefinition;
+  readonly definition: SubCommandGroupDefinition;
   constructor(definition: Omit<SubCommandGroupDefinition, 'type'>) {
     this.definition = {
       type: ApplicationCommandOptionType.SubcommandGroup,

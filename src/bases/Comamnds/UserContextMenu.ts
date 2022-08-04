@@ -6,7 +6,7 @@ import {
 
 export default abstract class UserApplicationCommandBase {
   readonly type = 'USER';
-  definition: UserApplicationCommandData;
+  readonly definition: UserApplicationCommandData;
   constructor(definition: Omit<UserApplicationCommandData, 'type'>) {
     this.definition = {
       type: ApplicationCommandType.User,
