@@ -1,5 +1,6 @@
 export { DelayedDataStore } from './delay';
 export { DataStoreAdapter, StorageObject } from './adapter';
+import crypto from 'crypto';
 
 export interface DataStore<K, V> {
   getUniqueKey(): K;
@@ -11,9 +12,10 @@ export interface DataStore<K, V> {
 
 export class DefaultDataStore<V> implements DataStore<string, V> {
   store: Map<string, V> = new Map();
+  private prefix = crypto.randomUUID();
   private keyseq = 0;
   getUniqueKey() {
-    return (this.keyseq += 1).toString();
+    return `${this.prefix}-${(this.keyseq += 1)}`;
   }
   set(key: string, value: V) {
     this.store.set(key, value);
