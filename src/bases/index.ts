@@ -12,13 +12,16 @@ import ChatInputApplicationCommandBase from './Comamnds/ChatInput';
 import MessageApplicationCommandBase from './Comamnds/MessageContextMenu';
 import UserApplicationCommandBase from './Comamnds/UserContextMenu';
 import Button from './Components/Button';
-import Modal from './Components/Modal';
 import SelectMenu from './Components/SelectMenu';
+import Modal from './Components/Modal';
 
 export {
   ChatInputApplicationCommandBase,
   MessageApplicationCommandBase,
   UserApplicationCommandBase,
+  Button,
+  SelectMenu,
+  Modal,
 };
 export * from './SubCommand';
 

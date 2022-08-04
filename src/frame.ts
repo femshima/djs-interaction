@@ -11,10 +11,10 @@ import {
   DataTypes,
   InteractionTypes,
   isT,
+  Button,
+  SelectMenu,
+  Modal,
 } from './bases';
-import Button from './bases/Components/Button';
-import Modal from './bases/Components/Modal';
-import SelectMenu from './bases/Components/SelectMenu';
 import { DataStore, DefaultDataStore } from './store';
 
 export default class InteractionFrame<
