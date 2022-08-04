@@ -85,12 +85,17 @@ export default class InteractionFrame<
       MODAL: Modal,
     };
     const BaseClass = Bases[base];
+
+    // we cannot modify BaseClass.prototype directory,
+    // so copy the function first.
     const Base = BaseClass.bind(null) as typeof BaseClass;
 
     // this is necessary for discord.js to treat WithHandler as ComponentBuilder,
     // urging it to call toJSON().
     Base.prototype = Object.create(ComponentBuilder.prototype);
 
+    // prepare Base.prototype, because it is empty now.
+    // and also, setting the store.
     Object.defineProperties(Base.prototype, {
       ...Object.getOwnPropertyDescriptors(BaseClass.prototype),
       store: {
