@@ -42,10 +42,25 @@ export default class InteractionFrame<
 
   async registerCommand(options: {
     client: Client<true>;
-    commands: ApplicationCommandBases[];
+    commands:
+      | ApplicationCommandBases[]
+      | Record<string, ApplicationCommandBases>;
     guilds?: boolean | GuildResolvable[];
+    subscribeToEvent?: boolean;
   }) {
-    const { client, commands } = options;
+    const { client } = options;
+    if (options.subscribeToEvent) {
+      client.on('interactionCreate', this.interactionCreate.bind(this));
+    }
+
+    const commands = (
+      Array.isArray(options.commands)
+        ? options.commands
+        : Object.values(options.commands)
+    ).map((command) =>
+      typeof command === 'function' ? new command() : command
+    );
+
     const guilds =
       options.guilds === true
         ? (await client.guilds.fetch()).map((v) => v.id)

@@ -10,18 +10,15 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds],
 });
 
-client.on('interactionCreate', (interaction) =>
-  frame.interactionCreate(interaction)
-);
-
 client.login(BOT_TOKEN).then(async () => {
   await frame.registerCommand({
     client,
-    commands: [
-      ...Object.values(Command).map((c) => new c()),
-      ...Object.values(ContextMenu).map((c) => new c()),
-    ],
+    commands: {
+      ...Command,
+      ...ContextMenu,
+    },
     guilds: !env.production,
+    subscribeToEvent: true,
   });
   console.log('Command initialized!');
 });

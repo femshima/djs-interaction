@@ -34,10 +34,13 @@ export interface DataTypes {
   MODAL: Modal;
 }
 
-export type ApplicationCommandBases =
+type OrConstructable<T> = T | { new (): T };
+
+export type ApplicationCommandBases = OrConstructable<
   | ChatInputApplicationCommandBase
   | MessageApplicationCommandBase
-  | UserApplicationCommandBase;
+  | UserApplicationCommandBase
+>;
 
 export function isT<T extends CommandTypes>(
   type: T,
