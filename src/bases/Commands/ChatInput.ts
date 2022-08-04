@@ -36,18 +36,31 @@ export default abstract class ChatInputApplicationCommandBase {
       }),
     };
   }
-  get subCommands(): (SubCommand | SubCommandGroup)[] {
+  subCommands(
+    groupName: string | null,
+    commandName: string | null
+  ): (SubCommand | SubCommandGroup)[] {
     return (this.data.options ?? [])
-      .map((o) => {
-        if (o instanceof SubCommand) {
-          return o;
-        } else if (o instanceof SubCommandGroup) {
-          const subcommands = o.definition.options?.filter(
-            (o): o is SubCommand => {
-              return o instanceof SubCommand;
+      .map((option1) => {
+        if (
+          option1 instanceof SubCommand &&
+          groupName === null &&
+          option1.definition.name === commandName
+        ) {
+          return option1;
+        } else if (
+          option1 instanceof SubCommandGroup &&
+          option1.definition.name === groupName
+        ) {
+          const subcommands = option1.definition.options?.filter(
+            (option2): option2 is SubCommand => {
+              return (
+                option2 instanceof SubCommand &&
+                option2.definition.name === commandName
+              );
             }
           );
-          return [o, ...(subcommands ?? [])];
+          return [option1, ...(subcommands ?? [])];
         }
       })
       .flat()

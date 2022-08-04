@@ -54,7 +54,10 @@ export async function CallIfMatches(
   if (interaction.isChatInputCommand() && isT('CHAT_INPUT', target)) {
     try {
       await target.handle?.(interaction);
-      for (const subcommand of target.subCommands) {
+      for (const subcommand of target.subCommands(
+        interaction.options.getSubcommandGroup(),
+        interaction.options.getSubcommand(false)
+      )) {
         await subcommand?.handle?.(interaction);
       }
     } catch (e) {
