@@ -1,4 +1,4 @@
-import { DataTypes, InteractionTypes } from './bases';
+import { DataTypes, CommandTypes } from './bases';
 import { DataStore, DataStoreAdapter, StorageObject } from './store';
 
 export {
@@ -22,9 +22,4 @@ export * from './init';
 export class Adapter<
   D extends object,
   Store extends DataStore<string, StorageObject<D>>
-> extends DataStoreAdapter<
-  string,
-  DataTypes[keyof InteractionTypes],
-  D,
-  Store
-> {}
+> extends DataStoreAdapter<string, DataTypes[CommandTypes], D, Store> {}

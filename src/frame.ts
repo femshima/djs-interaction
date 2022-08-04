@@ -9,7 +9,7 @@ import {
   ApplicationCommandBases,
   CallIfMatches,
   DataTypes,
-  InteractionTypes,
+  CommandTypes,
   isT,
   Button,
   SelectMenu,
@@ -18,10 +18,9 @@ import {
 import { DataStore, DefaultDataStore } from './store';
 
 export default class InteractionFrame<
-  T extends DataStore<
-    string,
-    DataTypes[keyof InteractionTypes]
-  > = DefaultDataStore<DataTypes[keyof InteractionTypes]>
+  T extends DataStore<string, DataTypes[CommandTypes]> = DefaultDataStore<
+    DataTypes[CommandTypes]
+  >
 > {
   store: T;
   constructor(options: { store: T }) {

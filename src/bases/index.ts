@@ -1,12 +1,4 @@
-import {
-  ButtonInteraction,
-  SelectMenuInteraction,
-  ModalSubmitInteraction,
-  CommandInteraction,
-  Interaction,
-  MessageContextMenuCommandInteraction,
-  UserContextMenuCommandInteraction,
-} from 'discord.js';
+import { Interaction } from 'discord.js';
 import AbortError from '../error/AbortError';
 import ChatInputApplicationCommandBase from './Comamnds/ChatInput';
 import MessageApplicationCommandBase from './Comamnds/MessageContextMenu';
@@ -25,14 +17,13 @@ export {
 };
 export * from './SubCommand';
 
-export interface InteractionTypes {
-  CHAT_INPUT: CommandInteraction<'cached'>;
-  MESSAGE: MessageContextMenuCommandInteraction<'cached'>;
-  USER: UserContextMenuCommandInteraction<'cached'>;
-  BUTTON: ButtonInteraction<'cached'>;
-  SELECT_MENU: SelectMenuInteraction<'cached'>;
-  MODAL: ModalSubmitInteraction<'cached'>;
-}
+export type CommandTypes =
+  | 'CHAT_INPUT'
+  | 'MESSAGE'
+  | 'USER'
+  | 'BUTTON'
+  | 'SELECT_MENU'
+  | 'MODAL';
 
 export interface DataTypes {
   CHAT_INPUT: ChatInputApplicationCommandBase;
@@ -48,7 +39,7 @@ export type ApplicationCommandBases =
   | MessageApplicationCommandBase
   | UserApplicationCommandBase;
 
-export function isT<T extends keyof InteractionTypes>(
+export function isT<T extends CommandTypes>(
   type: T,
   target: unknown
 ): target is DataTypes[T] {
@@ -57,7 +48,7 @@ export function isT<T extends keyof InteractionTypes>(
 }
 
 export async function CallIfMatches(
-  target: DataTypes[keyof InteractionTypes],
+  target: DataTypes[CommandTypes],
   interaction: Interaction<'cached'>
 ) {
   if (interaction.isChatInputCommand() && isT('CHAT_INPUT', target)) {

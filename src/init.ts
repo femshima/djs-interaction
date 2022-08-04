@@ -1,8 +1,8 @@
-import { DataTypes, InteractionTypes } from './bases';
+import { DataTypes, CommandTypes } from './bases';
 import InteractionFrame from './frame';
 import { DelayedDataStore } from './store';
 
-const store = new DelayedDataStore<DataTypes[keyof InteractionTypes]>();
+const store = new DelayedDataStore<DataTypes[CommandTypes]>();
 
 export const frame = new InteractionFrame({
   store,
