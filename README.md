@@ -21,42 +21,75 @@ discord.jsには各種のInteractionがありますが、
 
 ## データベースと連携させる場合
 
-デフォルトではInteractionの定義はメモリに保存されるため、プログラムを終了させた時点で蒸発します。これを防ぐには、データベースなどに保存しておく必要があります(なお、データベースに保存する形式を自由に指定できるようにするため、djs-interactionからは型とクラスを提供するだけになっています)。
+デフォルトではInteractionの定義はメモリに保存されるため、プログラムを終了させた時点で蒸発します。これを防ぐには、データベースなどに保存しておく必要があります。
 
-1. 各ファイルからインポートできる位置に`adapter.ts`を作成します。
+djs-interactionでデータベースを使うには、`frame.setup`の実行時に`database`オプションを指定します。
 
-  ```ts
-  import { Adapter, DefaultDataStore, StorageObject } from "djs-interaction";
+### [Prisma](https://www.prisma.io/)を使う場合
 
-  type StoreType = Record<string, string>;
+  まず、スキーマの例を示します。重要なのは`model Interaction`の部分だけですので、他の部分は適宜変更してください。また、列名と型が同じであればテーブル名を変えても構いません。
 
+  ```Prisma
+  generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native"]
+  }
 
-  // This will be adapter to database in real use cases
-  const store = new DefaultDataStore<StorageObject<StoreType>>();
+  datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+  }
 
-  export const adapter =
-      new Adapter<StoreType, DefaultDataStore<StorageObject<StoreType>>>(store)
+  model Interaction {
+    id           String  @id
+    classKey     String
+    classVersion String?
+    data         Json
+  }
   ```
 
-1. 適当な箇所(`registerCommand`の直前など)でAdapterを設定します。
+  setup部分は次のように書きます。テーブル名はスキーマに合わせてください。
 
   ```ts
-  import { adapter } from './adapter'
-  //...
-  await frame.store.setStore(adapter)
+  const prisma = new PrismaClient()
+  await frame.setup({
+    //...
+    database: prisma.interaction
+  });
   ```
 
-1. すべてのコマンド定義、コンポーネント定義の直後にserializer/deserializerを記述します。
+### Prismaを使わない場合
 
   ```ts
-  adapter.register({
-    key: 'more',
-    ctor: More,
-    serialize(from) {
-      return from.serialize()
-    },
-    deserialize(to) {
-      return new More(to.message)
-    }
-  })
+  await frame.setup({
+      //...
+      database: {
+        findUnique(options) {
+          // options.where.idがidに一致するレコードを探して返します。
+          // レコードの形式は次のようになっています。
+          // {
+          //   id: string; // depends on what kind of idgen you use.
+          //   classKey: string; // the key set in class or the name of the class
+          //   classVersion: string | null; // version set in class or null
+          //   data: JsonObject;
+          // }
+          //
+          // 例:
+          // {
+          //   id: 'id-1',
+          //   classKey: 'Target',
+          //   classVersion: null,
+          //   data: {
+          //     type: 'MODAL',
+          //     message: 'msg',
+          //     data: { d: 'X' },
+          //   },
+          // }
+        },
+        create(options) {
+          // findUniqueで説明したようなレコードがoptions.dataとして渡されるので、データベースに登録します。
+          // idが重複することは想定されていませんので、重複した場合は例外を投げるべきです。
+        }
+      }
+    });
   ```
