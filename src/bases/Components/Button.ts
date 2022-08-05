@@ -33,10 +33,10 @@ export default abstract class Button {
   toJSON() {
     return this.data;
   }
-  get store(): StoreAdapter<Button> | undefined {
+  private get store(): StoreAdapter<Button> | undefined {
     return undefined;
   }
-  get idGen(): IDGen | undefined {
+  private get idGen(): IDGen | undefined {
     return undefined;
   }
 }

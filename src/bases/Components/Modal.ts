@@ -23,10 +23,10 @@ export default abstract class Modal {
   toJSON() {
     return this.data;
   }
-  get store(): StoreAdapter<Modal> | undefined {
+  private get store(): StoreAdapter<Modal> | undefined {
     return undefined;
   }
-  get idGen(): IDGen | undefined {
+  private get idGen(): IDGen | undefined {
     return undefined;
   }
 }
