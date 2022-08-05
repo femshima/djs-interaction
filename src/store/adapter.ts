@@ -1,19 +1,21 @@
 import { Collection } from 'discord.js';
 
 export interface Database {
-  findUnique(options: { where: { id: string } }): Promise<DatabaseType | null>;
-  create(options: { data: DatabaseType }): Promise<void>;
+  findUnique(options: {
+    where: { id: string };
+  }): Promise<DatabaseType<JsonValue> | null>;
+  create(options: { data: DatabaseType<JsonObject> }): Promise<void>;
 }
 
 type JsonObject = { [key in string]?: JsonValue };
 type JsonArray = JsonValue[];
 type JsonValue = string | number | boolean | JsonObject | JsonArray | null;
 
-export interface DatabaseType {
+interface DatabaseType<T extends JsonValue> {
   id: string; // depends on what kind of idgen you use.
   classKey: string; // the key set in class or the name of the class
   classVersion: string | null; // version set in class or null
-  data: JsonValue;
+  data: T;
 }
 
 export interface ClassType<T> {
@@ -83,7 +85,7 @@ export default class StoreAdapter<T> {
           ])
         );
       });
-    const data: DatabaseType = {
+    const data: DatabaseType<JsonObject> = {
       id,
       classKey: classFound.key ?? classFound.name,
       classVersion: classFound.version ?? null,
