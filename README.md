@@ -1,8 +1,7 @@
 # djs-interactions
 
-discord.jsには各種のInteractionがありますが、
-それらの定義とハンドラを近い位置に書けるようにすることで
-使いやすくするフレームワーク的何かです。
+discord.jsのコマンドやComponentの定義と
+Interactionのハンドラを近い位置に書けるようにするフレームワークです。
 
 ## 使い方
 
