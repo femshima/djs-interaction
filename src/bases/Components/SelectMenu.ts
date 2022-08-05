@@ -21,7 +21,7 @@ export default abstract class SelectMenu {
   toJSON() {
     return this.data;
   }
-  get store(): StoreAdapter<typeof this> | undefined {
+  get store(): StoreAdapter<SelectMenu> | undefined {
     return undefined;
   }
   get idGen(): IDGen | undefined {
