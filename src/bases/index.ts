@@ -34,13 +34,17 @@ export interface DataTypes {
   MODAL: Modal;
 }
 
-type OrConstructable<T> = T | { new (): T };
+type Constructable<T> = { new (): T };
+type OrConstructable<T> = T | Constructable<T>;
 
-export type ApplicationCommandBases = OrConstructable<
+export type ApplicationCommandBaseInstances =
   | ChatInputApplicationCommandBase
   | MessageApplicationCommandBase
-  | UserApplicationCommandBase
->;
+  | UserApplicationCommandBase;
+export type ApplicationCommandBases =
+  OrConstructable<ApplicationCommandBaseInstances>;
+
+export type ComponentClasses = Button | SelectMenu | Modal;
 
 export function isT<T extends CommandTypes>(
   type: T,
@@ -66,10 +70,6 @@ export async function CallIfMatches(
     } catch (e) {
       if (e instanceof AbortError) {
         return;
-      } else if (e instanceof Error) {
-        throw new Error('ChatInput interaction handler throwed an error.', {
-          cause: e,
-        });
       } else {
         throw e;
       }

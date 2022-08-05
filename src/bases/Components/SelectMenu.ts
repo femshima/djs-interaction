@@ -4,19 +4,16 @@ import {
   SelectMenuInteraction,
 } from 'discord.js';
 import InitializationError from '../../error/InitializationError';
-
-interface Store {
-  getUniqueKey(): string;
-  set(key: string, value: SelectMenu): void;
-}
+import StoreAdapter from '../../store/adapter';
+import { IDGen } from '../../store/idgen';
 
 export default abstract class SelectMenu {
   readonly type = 'SELECT_MENU';
   data: APISelectMenuComponent;
   constructor(data: Omit<APISelectMenuComponent, 'type' | 'custom_id'>) {
-    if (!this.store)
+    if (!this.store || !this.idGen)
       throw new InitializationError('Do not extend SelectMenu directly!');
-    const custom_id = this.store.getUniqueKey();
+    const custom_id = this.idGen.generateID();
     this.data = new SelectMenuBuilder({ ...data, custom_id }).toJSON();
     this.store.set(this.data.custom_id, this);
   }
@@ -24,7 +21,10 @@ export default abstract class SelectMenu {
   toJSON() {
     return this.data;
   }
-  get store(): Store | undefined {
+  get store(): StoreAdapter<typeof this> | undefined {
+    return undefined;
+  }
+  get idGen(): IDGen | undefined {
     return undefined;
   }
 }

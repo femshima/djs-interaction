@@ -4,15 +4,12 @@ import {
   ButtonInteraction,
 } from 'discord.js';
 import InitializationError from '../../error/InitializationError';
+import StoreAdapter from '../../store/adapter';
+import { IDGen } from '../../store/idgen';
 
 type DistributiveOmit<T, K extends string | number | symbol> = T extends unknown
   ? Omit<T, K>
   : never;
-
-interface Store {
-  getUniqueKey(): string;
-  set(key: string, value: Button): void;
-}
 
 export default abstract class Button {
   readonly type = 'BUTTON';
@@ -20,9 +17,9 @@ export default abstract class Button {
   constructor(
     data: DistributiveOmit<APIButtonComponent, 'type' | 'custom_id'>
   ) {
-    if (!this.store)
+    if (!this.store || !this.idGen)
       throw new InitializationError('Do not extend Button directly!');
-    const custom_id = this.store.getUniqueKey();
+    const custom_id = this.idGen.generateID();
     if ('url' in data) {
       this.data = new ButtonBuilder({ ...data }).toJSON();
     } else {
@@ -36,7 +33,10 @@ export default abstract class Button {
   toJSON() {
     return this.data;
   }
-  get store(): Store | undefined {
+  get store(): StoreAdapter<typeof this> | undefined {
+    return undefined;
+  }
+  get idGen(): IDGen | undefined {
     return undefined;
   }
 }

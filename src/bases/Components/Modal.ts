@@ -4,11 +4,8 @@ import {
   ModalSubmitInteraction,
 } from 'discord.js';
 import InitializationError from '../../error/InitializationError';
-
-interface Store {
-  getUniqueKey(): string;
-  set(key: string, value: Modal): void;
-}
+import StoreAdapter from '../../store/adapter';
+import { IDGen } from '../../store/idgen';
 
 export default abstract class Modal {
   readonly type = 'MODAL';
@@ -16,9 +13,9 @@ export default abstract class Modal {
   constructor(
     data: Omit<APIModalInteractionResponseCallbackData, 'type' | 'custom_id'>
   ) {
-    if (!this.store)
+    if (!this.store || !this.idGen)
       throw new InitializationError('Do not extend Modal directly!');
-    const custom_id = this.store.getUniqueKey();
+    const custom_id = this.idGen.generateID();
     this.data = new ModalBuilder({ ...data, custom_id }).toJSON();
     this.store.set(this.data.custom_id, this);
   }
@@ -26,7 +23,10 @@ export default abstract class Modal {
   toJSON() {
     return this.data;
   }
-  get store(): Store | undefined {
+  get store(): StoreAdapter<typeof this> | undefined {
+    return undefined;
+  }
+  get idGen(): IDGen | undefined {
     return undefined;
   }
 }

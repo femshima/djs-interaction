@@ -1,6 +1,7 @@
 import {
   ApplicationCommandData,
   Client,
+  Collection,
   ComponentBuilder,
   GuildResolvable,
   Interaction,
@@ -8,24 +9,25 @@ import {
 import {
   ApplicationCommandBases,
   CallIfMatches,
-  DataTypes,
-  CommandTypes,
   isT,
   Button,
   SelectMenu,
   Modal,
+  ApplicationCommandBaseInstances,
+  ComponentClasses,
 } from './bases';
-import { DataStore, DefaultDataStore } from './store';
+import StoreAdapter, { ClassType, Database } from './store/adapter';
+import { IDGen, DefaultIDGenerator } from './store/idgen';
 
-export default class InteractionFrame<
-  T extends DataStore<string, DataTypes[CommandTypes]> = DefaultDataStore<
-    DataTypes[CommandTypes]
-  >
-> {
-  store: T;
-  constructor(options: { store: T }) {
-    this.store = options?.store;
-  }
+type ComponentClassType = ClassType<ComponentClasses>;
+
+export default class InteractionFrame {
+  private commandStore: Collection<string, ApplicationCommandBaseInstances> =
+    new Collection();
+  private componentStore?: StoreAdapter<ComponentClasses>;
+  private idGen: IDGen = new DefaultIDGenerator();
+  private fallback?: (interaction: Interaction) => Promise<void>;
+
   async interactionCreate(interaction: Interaction) {
     if (!interaction.inCachedGuild()) return;
 
@@ -34,24 +36,45 @@ export default class InteractionFrame<
       customId?: string;
     };
     const key = i.commandName || i.customId;
-    if (!key) return;
-    const value = await this.store.get(key);
-    if (!value) return;
+    if (!key) return await this.fallback?.(interaction);
+
+    const value =
+      this.commandStore.get(key) ?? (await this.componentStore?.fetch(key));
+    if (!value) return await this.fallback?.(interaction);
+
     await CallIfMatches(value, interaction);
+
+    if ('replied' in interaction) {
+      if (interaction.replied) await this.fallback?.(interaction);
+    } else {
+      if (interaction.responded) await this.fallback?.(interaction);
+    }
   }
 
-  async registerCommand(options: {
+  async setup(options: {
     client: Client<true>;
     commands:
       | ApplicationCommandBases[]
       | Record<string, ApplicationCommandBases>;
+    components: ComponentClassType[] | Record<string, ComponentClassType>;
     guilds?: boolean | GuildResolvable[];
     subscribeToEvent?: boolean;
+    fallback?: (interaction: Interaction) => Promise<void>;
+    database?: Database;
+    idGen?: IDGen;
   }) {
     const { client } = options;
     if (options.subscribeToEvent) {
       client.on('interactionCreate', this.interactionCreate.bind(this));
     }
+
+    const components = Array.isArray(options.components)
+      ? options.components
+      : Object.values(options.components);
+    this.componentStore = new StoreAdapter(components, options.database);
+
+    this.fallback = options.fallback;
+    this.idGen = options.idGen ?? this.idGen;
 
     const commands = (
       Array.isArray(options.commands)
@@ -68,11 +91,11 @@ export default class InteractionFrame<
 
     await Promise.all(
       commands.map((command) => {
-        return this.store.set(command.definition.name, command);
+        return this.commandStore.set(command.definition.name, command);
       })
     );
 
-    const defs: ApplicationCommandData[] = (await this.store.values())
+    const defs: ApplicationCommandData[] = [...this.commandStore.values()]
       .map((v) => {
         if (isT('CHAT_INPUT', v) || isT('MESSAGE', v) || isT('USER', v)) {
           return v.definition;
@@ -114,7 +137,10 @@ export default class InteractionFrame<
     Object.defineProperties(Base.prototype, {
       ...Object.getOwnPropertyDescriptors(BaseClass.prototype),
       store: {
-        get: () => this.store,
+        get: () => this.componentStore,
+      },
+      idGen: {
+        get: () => this.idGen,
       },
     });
 
