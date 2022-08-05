@@ -2,11 +2,7 @@ import { Collection } from 'discord.js';
 
 export interface Database {
   findUnique(options: { where: { id: string } }): Promise<DatabaseType | null>;
-  upsert(options: {
-    where: { id: string };
-    update: DatabaseType;
-    create: DatabaseType;
-  }): Promise<void>;
+  create(options: { data: DatabaseType }): Promise<void>;
 }
 
 type JsonObject = { [key in string]: JsonValue };
@@ -73,8 +69,13 @@ export default class StoreAdapter<T> {
 
     const serliazer =
       classFound.serialize ??
-      ((instance: T) => {
-        return JSON.parse(JSON.stringify(instance)) as JsonObject;
+      ((instance: T): JsonObject => {
+        return Object.fromEntries(
+          Object.entries(instance).map(([key, value]) => [
+            key,
+            JSON.parse(JSON.stringify(value)),
+          ])
+        );
       });
     const data: DatabaseType = {
       id,
@@ -83,10 +84,6 @@ export default class StoreAdapter<T> {
       data: serliazer(value),
     };
 
-    await this.store.upsert({
-      where: { id },
-      update: data,
-      create: data,
-    });
+    await this.store.create({ data });
   }
 }
