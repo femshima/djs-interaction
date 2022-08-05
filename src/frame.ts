@@ -133,7 +133,7 @@ export default class InteractionFrame {
     Base.prototype = Object.create(ComponentBuilder.prototype);
 
     // prepare Base.prototype, because it is empty now.
-    // and also, setting the store.
+    // and also set the store and the idGen.
     Object.defineProperties(Base.prototype, {
       ...Object.getOwnPropertyDescriptors(BaseClass.prototype),
       store: {
