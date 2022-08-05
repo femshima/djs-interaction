@@ -4,7 +4,7 @@ export interface Database {
   findUnique(options: {
     where: { id: string };
   }): Promise<DatabaseType<JsonValue> | null>;
-  create(options: { data: DatabaseType<JsonObject> }): Promise<void>;
+  create(options: { data: DatabaseType<JsonObject> }): Promise<unknown>;
 }
 
 type JsonObject = { [key in string]?: JsonValue };
