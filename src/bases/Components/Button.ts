@@ -25,12 +25,15 @@ export default abstract class Button {
     } else {
       this.data = new ButtonBuilder({ ...data, custom_id }).toJSON();
     }
-    if ('custom_id' in this.data) {
-      this.store.set(this.data.custom_id, this);
-    }
   }
   handle?(interaction: ButtonInteraction<'cached'>): Promise<void>;
   toJSON() {
+    if (!this.store)
+      throw new InitializationError('Do not extend Button directly!');
+    if ('custom_id' in this.data) {
+      this.store.set(this.data.custom_id, this);
+    }
+
     return this.data;
   }
   private get store(): StoreAdapter<Button> | undefined {
