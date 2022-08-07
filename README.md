@@ -5,7 +5,7 @@ Interactionのハンドラを近い位置に書けるようにするフレーム
 
 ## 使い方
 
-詳しい使い方は`sample/`を見てください。
+詳しい使い方は[`sample/`](https://github.com/femshima/djs-interaction/tree/main/sample)を見てください。
 
 | Interactionの種類 | 説明 |
 | -- | -- |
