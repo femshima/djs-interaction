@@ -1,4 +1,4 @@
-# djs-interactions
+# djs-interaction
 
 discord.jsのコマンドやComponentの定義と
 Interactionのハンドラを近い位置に書けるようにするフレームワークです。
@@ -85,7 +85,7 @@ export default class Ping extends Command {
 
 #### サブコマンド
 
-djs-interactionsはサブコマンドにも対応しています。
+djs-interactionはサブコマンドにも対応しています。
 サブコマンドでは`SubCommand`を継承してください。
 通常のコマンドと同じように、`constructor`でコマンド定義を`super`に渡して呼び出します。
 ただし、通常のコマンドと異なり、`handler`を定義しないとTypeScriptでエラーになります。
