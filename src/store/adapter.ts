@@ -75,7 +75,7 @@ export default class StoreAdapter<T> {
         'Unknown instance of class supplied. Maybe forgot to register?'
       );
 
-    const serliazer =
+    const serlializer =
       classFound.serialize ??
       ((instance: T): JsonObject => {
         return Object.fromEntries(
@@ -89,7 +89,7 @@ export default class StoreAdapter<T> {
       id,
       classKey: classFound.key ?? classFound.name,
       classVersion: classFound.version ?? null,
-      data: serliazer(value),
+      data: serlializer(value),
     };
 
     await this.store.create({ data });

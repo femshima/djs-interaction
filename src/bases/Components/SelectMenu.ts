@@ -15,10 +15,13 @@ export default abstract class SelectMenu {
       throw new InitializationError('Do not extend SelectMenu directly!');
     const custom_id = this.idGen.generateID();
     this.data = new SelectMenuBuilder({ ...data, custom_id }).toJSON();
-    this.store.set(this.data.custom_id, this);
   }
   abstract handle(interaction: SelectMenuInteraction<'cached'>): Promise<void>;
   toJSON() {
+    if (!this.store)
+      throw new InitializationError('Do not extend Button directly!');
+    this.store.set(this.data.custom_id, this);
+
     return this.data;
   }
   private get store(): StoreAdapter<SelectMenu> | undefined {
