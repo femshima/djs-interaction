@@ -3,33 +3,33 @@ import {
   ModalBuilder,
   ModalSubmitInteraction,
 } from 'discord.js';
-import InitializationError from '../../error/InitializationError';
-import StoreAdapter from '../../store/adapter';
-import { IDGen } from '../../store/idgen';
+import { ConstructorDataType, createData, FrameType } from './common';
 
 export default abstract class Modal {
   readonly type = 'MODAL';
   data: APIModalInteractionResponseCallbackData;
+  private readonly __onToJSON: () => void;
   constructor(
-    data: Omit<APIModalInteractionResponseCallbackData, 'type' | 'custom_id'>
+    data: ConstructorDataType<APIModalInteractionResponseCallbackData>
   ) {
-    if (!this.store || !this.idGen)
-      throw new InitializationError('Do not extend Modal directly!');
-    const custom_id = this.idGen.generateID();
-    this.data = new ModalBuilder({ ...data, custom_id }).toJSON();
+    const { data: jsonData, onToJSON } = createData<
+      APIModalInteractionResponseCallbackData,
+      typeof this
+    >({
+      self: this,
+      data,
+      Builder: ModalBuilder,
+      frame: this.__frame,
+    });
+    this.data = jsonData;
+    this.__onToJSON = onToJSON;
   }
   abstract handle(interaction: ModalSubmitInteraction<'cached'>): Promise<void>;
   toJSON() {
-    if (!this.store)
-      throw new InitializationError('Do not extend Button directly!');
-    this.store.set(this.data.custom_id, this);
-
+    this.__onToJSON();
     return this.data;
   }
-  private get store(): StoreAdapter<Modal> | undefined {
-    return undefined;
-  }
-  private get idGen(): IDGen | undefined {
+  private get __frame(): FrameType<typeof this> | undefined {
     return undefined;
   }
 }
