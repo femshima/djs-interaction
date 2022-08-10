@@ -136,11 +136,8 @@ export default class InteractionFrame {
     // and also set the store and the idGen.
     Object.defineProperties(Base.prototype, {
       ...Object.getOwnPropertyDescriptors(BaseClass.prototype),
-      store: {
-        get: () => this.componentStore,
-      },
-      idGen: {
-        get: () => this.idGen,
+      __frame: {
+        get: () => this,
       },
     });
 
