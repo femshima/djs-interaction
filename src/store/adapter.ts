@@ -46,17 +46,17 @@ export default class StoreAdapter<T> {
     )
       return undefined;
 
-    const classFound = this.classes.get(found.classKey);
+    const ClassFound = this.classes.get(found.classKey);
     if (
-      !classFound ||
-      (classFound.version && classFound.version !== found.classVersion)
+      !ClassFound ||
+      (ClassFound.version && ClassFound.version !== found.classVersion)
     )
       return undefined;
 
     const deserializer =
-      classFound.deserialize ??
+      ClassFound.deserialize ??
       ((serlialized: JsonObject) => {
-        const obj = Object.create(classFound.prototype);
+        const obj = Object.create(ClassFound.prototype);
         Object.entries(serlialized).forEach(([k, v]) => {
           obj[k] = v;
         });
@@ -69,14 +69,14 @@ export default class StoreAdapter<T> {
 
     if (!this.store) return;
 
-    const classFound = this.classes.find((c) => value instanceof c);
-    if (!classFound)
+    const ClassFound = this.classes.find((c) => value instanceof c);
+    if (!ClassFound)
       throw new Error(
         'Unknown instance of class supplied. Maybe forgot to register?'
       );
 
     const serlializer =
-      classFound.serialize ??
+      ClassFound.serialize ??
       ((instance: T): JsonObject => {
         return Object.fromEntries(
           Object.entries(instance).map(([key, value]) => [
@@ -87,8 +87,8 @@ export default class StoreAdapter<T> {
       });
     const data: DatabaseType<JsonObject> = {
       id,
-      classKey: classFound.key ?? classFound.name,
-      classVersion: classFound.version ?? null,
+      classKey: ClassFound.key ?? ClassFound.name,
+      classVersion: ClassFound.version ?? null,
       data: serlializer(value),
     };
 
