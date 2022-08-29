@@ -30,13 +30,32 @@ export interface ClassType<T> {
 export default class StoreAdapter<T> {
   cache: Collection<string, T> = new Collection();
   classes: Collection<string, ClassType<T>>;
+
   constructor(classes: ClassType<T>[], public store?: Database) {
-    this.classes = new Collection(classes.map((c) => [c.key ?? c.name, c]));
+    this.classes = new Collection(classes.map((c) => [this.classKey(c), c]));
+
+    if (classes.length !== this.classes.size)
+      throw new Error('Class key must be unique');
   }
+
   async fetch(id: string) {
     const fromCache = this.cache.get(id);
     if (fromCache) return fromCache;
 
+    const byFixedCustomId = this.findByFixedCustomId(id);
+    if (byFixedCustomId) return byFixedCustomId;
+
+    return await this.fetchFromDatabase(id);
+  }
+
+  private findByFixedCustomId(id: string) {
+    const ClassFound = this.classes.get(id);
+    if (!ClassFound) return undefined;
+
+    return new ClassFound();
+  }
+
+  private async fetchFromDatabase(id: string) {
     const found = await this.store?.findUnique({ where: { id } });
     if (
       !found ||
@@ -64,16 +83,13 @@ export default class StoreAdapter<T> {
       });
     return deserializer(found.data);
   }
+
   async set(id: string, value: T) {
     this.cache.set(id, value);
 
     if (!this.store) return;
 
-    const ClassFound = this.classes.find((c) => value instanceof c);
-    if (!ClassFound)
-      throw new Error(
-        'Unknown instance of class supplied. Maybe forgot to register?'
-      );
+    const ClassFound = this.resolveConstructor(value);
 
     const serlializer =
       ClassFound.serialize ??
@@ -87,11 +103,24 @@ export default class StoreAdapter<T> {
       });
     const data: DatabaseType<JsonObject> = {
       id,
-      classKey: ClassFound.key ?? ClassFound.name,
+      classKey: this.classKey(ClassFound),
       classVersion: ClassFound.version ?? null,
       data: serlializer(value),
     };
 
     await this.store.create({ data });
+  }
+
+  resolveConstructor(instance: unknown) {
+    const ClassFound = this.classes.find((c) => instance instanceof c);
+    if (!ClassFound)
+      throw new Error(
+        'Unknown instance of class supplied. Maybe forgot to register?'
+      );
+    return ClassFound;
+  }
+
+  classKey(Ctor: ClassType<T>) {
+    return Ctor.key ?? Ctor.name;
   }
 }

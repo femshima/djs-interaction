@@ -7,7 +7,7 @@ type DistributiveOmit<T, K extends string | number | symbol> = T extends unknown
   : never;
 
 interface FixedCustomIdOption {
-  fixed_custom_id?: string;
+  fixed_custom_id?: boolean;
 }
 
 export type ConstructorDataType<T> = DistributiveOmit<T, 'type' | 'custom_id'> &
@@ -38,17 +38,22 @@ export function createData<T, U>({
 
   const copied = { ...data } as Omit<T, 'type'> &
     FixedCustomIdOption & { custom_id?: string };
-  const isCustomIdFixed = typeof copied.fixed_custom_id === 'string';
 
   if (!omitCustomId) {
-    copied.custom_id = copied.fixed_custom_id ?? frame.idGen.generateID();
+    if (copied.fixed_custom_id) {
+      const ClassFound = frame.componentStore.resolveConstructor(self);
+      copied.custom_id = frame.componentStore.classKey(ClassFound);
+    } else {
+      copied.custom_id = frame.idGen.generateID();
+    }
   }
   delete copied.fixed_custom_id;
 
   return {
     data: new Builder(copied as Partial<T>).toJSON(),
     onToJSON() {
-      if (!isCustomIdFixed && copied.custom_id) {
+      if (copied.custom_id && !copied.fixed_custom_id) {
+        // Not awaiting because toJSON is called synchronously
         frame.componentStore.set(copied.custom_id, self);
       }
     },
