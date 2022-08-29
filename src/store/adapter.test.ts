@@ -86,7 +86,7 @@ describe('StoreAdapter', () => {
     expect(fn).toBeCalled();
   });
 
-  it('throws when class keys are duplicate', () => {
+  it('throws when class keys are duplicated', () => {
     class Base {}
     expect(
       () =>
