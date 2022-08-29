@@ -13,12 +13,12 @@ interface FixedCustomIdOption {
 export type ConstructorDataType<T> = DistributiveOmit<T, 'type' | 'custom_id'> &
   (T extends { custom_id?: string } ? FixedCustomIdOption : object);
 
-export interface FrameType<T> {
+export interface FrameType<T extends object> {
   idGen: IDGen;
   componentStore: StoreAdapter<T>;
 }
 
-interface CreateDataArgs<T, U> {
+interface CreateDataArgs<T, U extends object> {
   self: U;
   data: ConstructorDataType<T>;
   Builder: { new (data: Partial<T>): { toJSON(): T } };
@@ -26,7 +26,7 @@ interface CreateDataArgs<T, U> {
   omitCustomId?: boolean;
 }
 
-export function createData<T, U>({
+export function createData<T, U extends object>({
   self,
   data,
   Builder,
