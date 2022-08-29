@@ -1,6 +1,6 @@
 {
   "name": "@femshima/djs-interaction",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "Framework for interactions of discord.js",
   "main": "dist/index.js",
   "license": "MIT",
