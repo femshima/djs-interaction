@@ -27,7 +27,7 @@ export interface ClassType<T> {
   deserialize?(serialized: JsonObject): T;
 }
 
-export default class StoreAdapter<T> {
+export default class StoreAdapter<T extends object> {
   cache: Collection<string, T> = new Collection();
   classes: Collection<string, ClassType<T>>;
 
