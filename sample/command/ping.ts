@@ -2,6 +2,7 @@ import { CommandInteraction, ComponentType } from 'discord.js';
 import { Command } from '../../src';
 import { More } from '../component';
 import Link from '../component/link';
+import MoreFixed from '../component/more-fixed';
 
 export default class Ping extends Command {
   constructor() {
@@ -17,7 +18,7 @@ export default class Ping extends Command {
       components: [
         {
           type: ComponentType.ActionRow,
-          components: [new More('Hello!'), new Link()],
+          components: [new More('Hello!'), new MoreFixed(), new Link()],
         },
       ],
     });

@@ -85,4 +85,37 @@ describe('StoreAdapter', () => {
     await fetched?.handle(fn);
     expect(fn).toBeCalled();
   });
+
+  it('throws when class keys are duplicate', () => {
+    class Base {}
+    expect(
+      () =>
+        new StoreAdapter<Base>([
+          class A extends Base {},
+          class A extends Base {},
+        ])
+    ).toThrow('Class key must be unique');
+
+    expect(
+      () =>
+        new StoreAdapter<Base>([
+          class A extends Base {},
+          class A extends Base {
+            static key = 'B';
+          },
+        ])
+    ).not.toThrow('Class key must be unique');
+
+    expect(
+      () =>
+        new StoreAdapter<Base>([
+          class A extends Base {
+            static key = 'B';
+          },
+          class C extends Base {
+            static key = 'B';
+          },
+        ])
+    ).toThrow('Class key must be unique');
+  });
 });
