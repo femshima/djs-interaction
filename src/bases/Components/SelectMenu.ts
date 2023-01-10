@@ -1,29 +1,31 @@
 import {
-  APISelectMenuComponent,
-  SelectMenuBuilder,
-  SelectMenuInteraction,
+  APIStringSelectComponent,
+  StringSelectMenuBuilder,
+  StringSelectMenuInteraction,
 } from 'discord.js';
 import { ConstructorDataType, createData, FrameType } from './common';
 
 export default abstract class SelectMenu {
   readonly type = 'SELECT_MENU';
-  data: APISelectMenuComponent;
+  data: APIStringSelectComponent;
   private readonly __onToJSON: () => void;
-  constructor(data: ConstructorDataType<APISelectMenuComponent>) {
+  constructor(data: ConstructorDataType<APIStringSelectComponent>) {
     const { data: jsonData, onToJSON } = createData<
-      APISelectMenuComponent,
+      APIStringSelectComponent,
       typeof this
     >({
       self: this,
       data,
-      Builder: SelectMenuBuilder,
+      Builder: StringSelectMenuBuilder,
       frame: this.__frame,
       omitCustomId: 'url' in data,
     });
     this.data = jsonData;
     this.__onToJSON = onToJSON;
   }
-  abstract handle(interaction: SelectMenuInteraction<'cached'>): Promise<void>;
+  abstract handle(
+    interaction: StringSelectMenuInteraction<'cached'>
+  ): Promise<void>;
   toJSON() {
     this.__onToJSON();
     return this.data;
